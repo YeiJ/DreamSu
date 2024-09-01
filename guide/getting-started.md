@@ -61,6 +61,7 @@ pip install -r requirements.txt
 }
 ```
 
+！！请注意，json中不支持注释，请不要直接复制上述内容。
 截至目前暂未适配ws连接
 
 ## 使用方法
