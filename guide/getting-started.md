@@ -17,7 +17,7 @@ Python 版本建议在 3.9 及以上
 
    ```bash
    git clone https://github.com/YeiJ/DreamSu.git
-   cd DreamSu_LLOBPM
+   cd DreamSu
    ```
 
 2. 创建并激活虚拟环境（可选，但推荐）：
