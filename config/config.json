@@ -1,0 +1,10 @@
+{
+    "base_url": "http://localhost:3001",
+    "rtmsg_prot": 8081,
+    "token": "",
+    "masters": [
+        123456789, 
+        987654321
+    ],
+    "log_level": "info"
+}

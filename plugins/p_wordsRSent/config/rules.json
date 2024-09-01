@@ -1,0 +1,40 @@
+{
+  "r_rule1": {
+    "type": "scheduled_message",
+    "times": ["06:00", "19:06"],
+    "word_repos": ["r_example1.yml", "r_example2.yml"],
+    "word_quantity": 5,
+    "group_list": [123456789],
+    "friend_list": []
+  },    
+  "r_Herbst_Stadt": {
+      "type": "scheduled_message",
+      "times": ["07:00"],
+      "word_repos": ["r_Herbst_Stadt.yml"],
+      "word_quantity": 5,
+      "group_list": [321564987],
+      "friend_list": []
+    },    
+  "r_erbst_Stadt_keyword": {
+      "type": "group_message_keyword_reply",
+      "keywords": ["#随机词库"],
+      "word_repos": ["r_Herbst_Stadt.yml"],
+      "word_quantity": 5,
+      "group_list": [123456987],
+      "friend_list": []
+  },
+  "r_rule2": {
+    "type": "group_message_keyword_reply",
+    "keywords": ["%你好", "#他好"],
+    "word_repos": ["r_example1.yml"],
+    "word_quantity": 5,
+    "group_list": [9874561231,321654987],
+    "friend_list": [123564987]
+  },
+  "Meow": {
+    "错误示范": "非法的规则名"
+  },
+  "u_Meow1": {
+    "停用词条": "该词条被 u_ 前缀停用"
+  }
+}

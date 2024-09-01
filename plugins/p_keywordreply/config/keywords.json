@@ -1,0 +1,64 @@
+{
+
+    "keywords_list":[
+
+        {
+            "keyword": ["关键词1"],
+            "enable": true,
+            "method": "exact_match",
+            "admin_need": false,
+            "reply": "回复内容1",
+            "group_limits":{
+                "enable": true,
+                "atreply": true,
+                "method": "whitelist",
+                "group_ids": [123456789,321654897]
+            },
+            "private_limits":{
+                "enable": true,
+                "method": "blacklist",
+                "user_ids": [123456789,321654897]
+            }
+        },
+
+        {
+            "keyword": ["关键词2"],
+            "enable": true,
+            "method": "fuzzy_match",
+            "admin_need": true,
+            "reply": "回复内容1",
+            "group_limits":{
+                "enable": true,
+                "atreply": true,
+                "method": "blacklist",
+                "group_ids": [123456789,321654897]
+            },
+            "private_limits":{
+                "enable": true,
+                "method": "whitelist",
+                "user_ids": [123456789,321654897]
+            }
+        },
+
+        {
+            "keyword": ["关键词3"],
+            "enable": true,
+            "method": "fuzzy_match",
+            "admin_need": true,
+            "reply": "回复内容1",
+            "group_limits":{
+                "enable": true,
+                "atreply": true,
+                "method": "whitelist",
+                "group_ids": [123456789,321654897]
+            },
+            "private_limits":{
+                "enable": true,
+                "method": "whitelist",
+                "user_ids": [123456789,321654897]
+            }
+        }
+
+    ]
+
+}
