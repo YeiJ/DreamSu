@@ -73,3 +73,5 @@ DreamSu 意为苏梦，我的很多项目都叫这个名字。
 ## 许可证
 
 本项目使用 GPL-3.0 许可证 - 参见 [LICENSE](LICENSE) 文件了解更多详情。
+
+本项目仅在Github上发布仓库，[项目地址](https://github.com/YeiJ/DreamSu)。若在其他git仓库见到本项目军不是本人发布，使用时请注意甄别。
