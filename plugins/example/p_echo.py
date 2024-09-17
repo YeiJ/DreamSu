@@ -11,7 +11,7 @@ class P_echoPlugin(Plugin):
     def __init__(self, bot):
         self.bot = bot
 
-    def on_message(self, message):
+    async def on_message(self, message):
         user_id = message['user_id']
         raw_message = message['raw_message']
         message_type = message.get('message_type', '')  # 获取消息类型，默认为空字符串

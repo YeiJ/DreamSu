@@ -1,7 +1,30 @@
+# log.py
+
 import logging
 from datetime import datetime
 import os
 import json
+import concurrent.futures
+
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
+
+def async_log_write(func):
+    """包装函数，使其异步执行"""
+    def wrapper(*args, **kwargs):
+        return executor.submit(func, *args, **kwargs)
+    return wrapper
+
+@async_log_write
+def write_log_async(logger, message, level):
+    """异步写入日志"""
+    if level == 'INFO':
+        logger.info(message)
+    elif level == 'ERROR':
+        logger.error(message)
+    elif level == 'WARNING':
+        logger.warning(message)
+    else:
+        logger.debug(message)
 
 def setup_logging():
     """设置日志记录"""
@@ -51,18 +74,20 @@ def setup_logging():
 
     # 创建一个 FileHandler 以确保日志使用 utf-8 编码
     file_handler = logging.FileHandler(log_filename, encoding='utf-8')
-    file_handler.setLevel(log_level)  # 使用配置文件中的日志级别
+    file_handler.setLevel(log_level)
     file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
 
     # 配置 root logger
     logging.getLogger().setLevel(log_level)  # 使用配置文件中的日志级别
     logging.getLogger().addHandler(file_handler)
-
+    
     # 创建一个 StreamHandler 来同时在控制台输出日志
     console_handler = logging.StreamHandler()
     console_handler.setLevel(log_level)  # 使用配置文件中的日志级别
     console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
 
+    # 确保日志立即写入文件
+    file_handler.flush()
     # 将 StreamHandler 添加到 root logger
     logging.getLogger().addHandler(console_handler)
 
@@ -77,3 +102,7 @@ def manage_log_files(directory, suffix, keep_count=30):
     # 删除超过保留数量的日志文件
     for log_file in log_files[keep_count:]:
         os.remove(os.path.join(directory, log_file))
+
+# 在调用时异步写入日志：
+logger = logging.getLogger(__name__)
+write_log_async(logger, "这是一个异步日志消息喵～", "INFO")

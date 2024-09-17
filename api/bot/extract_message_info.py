@@ -18,6 +18,7 @@ def extract_message_info(self, message):
     message_type = message.get('message_type', '未知类型')
     raw_message = message.get('raw_message', '')
     group_id = message.get('group_id', '未知群ID')
+    group_info = None   
 
     result = None  # 确保 result 被初始化
 
@@ -34,13 +35,13 @@ def extract_message_info(self, message):
             group_id = message.get('group_id', '未知群ID')
             message_id = message.get('message_id', '未知消息ID')
 
-            
-            group_info = get_group_info(self.base_url, group_id, no_cache=True, token=self.token)  
+            # group_info = get_group_info(self.base_url, group_id, no_cache=False, token=self.token)  
             logger.debug(f"获取的 group_info: {group_info}")  
             if group_info is None:
                 # 处理 group_info 为 None 的情况
-                logger.error("group_info 为 None，无法提取信息")  
-                group_name = 'None'
+                logger.debug("group_info 为 None，无法提取信息")  
+                # group_name = 'None'
+                group_name = '由于性能问题，暂时下线群名称显示'
             else:
                 group_name = group_info['data']['group_name']
 
@@ -134,13 +135,14 @@ def extract_message_info(self, message):
     message_type_description = message_type_map.get(message_type, '未知类型')
 
     if message_type == 'group':
-        group_info = get_group_info(self.base_url, group_id, no_cache=True, token=self.token)  
-        logger.debug(f"获取的 group_info: {group_info}")  
+        # group_info = get_group_info(self.base_url, group_id, no_cache=True, token=self.token)  
+        
         if group_info is None:
             # 处理 group_info 为 None 的情况
-            logger.error("group_info 为 None，无法提取信息")  
-            group_name = 'None'
+            logger.debug("group_info 为 None，无法提取信息")  
+            group_name = '由于性能问题，暂时下线群名称显示'
         else:
+            logger.debug(f"获取的 group_info: {group_info}")  
             group_name = group_info['data']['group_name']
         
         #是否有群名片
@@ -160,7 +162,7 @@ def extract_message_info(self, message):
         # 格式化输出
         result = (
             f"消息类型: {message_type_description}\n"
-            f"群聊: {group_name} (ID: {group_id})\n"
+            f"群聊: ID: {group_id} ({group_name})\n"
             f"用户: {nickname} (ID: {user_id}){admin_marker}\n"
             f"内容: {' '.join(message_content) or raw_message}\n"
             f"消息ID: {message_id}\n"

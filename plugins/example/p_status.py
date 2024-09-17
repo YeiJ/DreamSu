@@ -16,7 +16,7 @@ class P_statusPlugin(Plugin):
         
         logger.info("status 插件正在初始化")
 
-    def on_message(self, message):
+    async def on_message(self, message):
         user_id = message['user_id']
         raw_message = message['raw_message']
         message_type = message.get('message_type', '')

@@ -29,7 +29,7 @@ class P_keywordreplyPlugin(Plugin):
             logger.error("关键词配置文件未找到：%s", config_path)
             return {}
 
-    def on_message(self, message):
+    async def on_message(self, message):
         user_id = message['user_id']
         message_type = message.get('message_type', '')
         raw_message = message['raw_message']

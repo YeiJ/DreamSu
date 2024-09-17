@@ -4,6 +4,7 @@ from plugin_base import Plugin
 import logging
 import os
 import json
+from .admin import P_wordsRSentAdmin
 from .execution import P_wordsRSentExecution
 
 logger = logging.getLogger("p_wordsRSent")
@@ -14,11 +15,24 @@ class P_wordsrsentPlugin(Plugin):
         self.words_repo = {}
         self.config = {}
         self.rules = {}
+        self.load_config()
         self.load_words_repo()
         self.load_rules()
 
         # 初始化后台管理模块和规则执行模块
         self.execution = P_wordsRSentExecution(bot, self.words_repo, self.rules)
+        # 暂时禁用 admin 模块
+        # self.admin = P_wordsRSentAdmin(bot, self.words_repo, self.rules, self.config)
+
+    def load_config(self):
+        """Load configuration from config.json."""
+        config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                self.config = json.load(f)
+            logger.info("配置文件加载完毕")
+        except Exception as e:
+            logger.error(f"配置文件加载失败:\n {e}")
 
     def load_words_repo(self):
         """Load enabled word repositories."""
@@ -39,5 +53,5 @@ class P_wordsrsentPlugin(Plugin):
         except Exception as e:
             logger.error(f"规则列表加载失败: \n{e}")
 
-    def on_message(self, message):
+    async def on_message(self, message):
         self.execution.on_message(message)  # 调用执行器的 on_message 方法
