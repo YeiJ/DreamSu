@@ -145,7 +145,10 @@ class Bot:
                         
                         # 格式化消息并输出到日志
                         extracted_info = self.extract_message_info(data)
-                        logger.debug("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
+                        if data.get('post_type') == 'meta_event':
+                            logger.debug("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
+                        else:
+                            logger.info("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
                         
                         # 处理消息
                         await self.handle_message(data)
