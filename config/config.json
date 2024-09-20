@@ -1,10 +1,17 @@
 {
-    "base_url": "http://localhost:3001",
-    "rtmsg_prot": 8081,
+    "rtmsg_type": "ws",
+
+    "rq_http_url": "http://localhost:3001",
+    "rt_http_prot": 8081,
+
+    "f_ws_url": "ws://localhost:3002",
+
     "token": "",
+
     "masters": [
         123456789, 
         987654321
     ],
+
     "log_level": "info"
 }

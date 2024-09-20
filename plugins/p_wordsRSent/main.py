@@ -4,7 +4,7 @@ from plugin_base import Plugin
 import logging
 import os
 import json
-from .admin import P_wordsRSentAdmin
+# from .admin import P_wordsRSentAdmin
 from .execution import P_wordsRSentExecution
 
 logger = logging.getLogger("p_wordsRSent")

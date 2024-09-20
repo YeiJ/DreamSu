@@ -31,7 +31,7 @@ def setup_logging():
 
     # 读取配置文件中的日志级别
     config_path = "config/config.json"
-    with open(config_path, "r") as f:
+    with open(config_path, "r", encoding="utf-8") as f:
         config = json.load(f)
     log_level_str = config.get("log_level", "info").upper()  # 从配置文件读取日志级别并转为大写
     log_level = getattr(logging, log_level_str, logging.INFO)  # 获取日志级别的数值，如果无效默认INFO

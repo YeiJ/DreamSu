@@ -25,6 +25,35 @@ def extract_message_info(self, message):
     # 提取消息内容
     message_content = []
 
+    # 处理 meta_event 类型的消息
+    if message.get('post_type') == 'meta_event':
+        meta_event_type = message.get('meta_event_type', '未知事件类型')
+
+        if meta_event_type == 'heartbeat':
+            status = message.get('status', {})
+            online_status = status.get('online', '未知在线状态')
+            good_status = status.get('good', '未知健康状态')
+            interval = message.get('interval', '未知心跳间隔')
+
+            result = (
+                f"心跳事件:\n"
+                f"在线状态: {online_status}\n"
+                f"健康状态: {good_status}\n"
+                f"心跳间隔: {interval} ms\n"
+            )
+            message_content.append(result)
+
+        elif meta_event_type == 'lifecycle':
+            sub_type = message.get('sub_type', '未知子类型')
+
+            result = (
+                f"生命周期事件:\n"
+                f"子类型: {sub_type}\n"
+            )
+            message_content.append(result)
+
+        return '\n'.join(message_content)  # 直接返回 meta_event 消息的内容
+
     #消息类型判断
     if message.get('post_type') == 'notice':
         notice_type = message.get('notice_type', '未知通知类型')
