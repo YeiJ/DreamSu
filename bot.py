@@ -29,7 +29,7 @@ class Bot:
 
         #连接配置
         self.rtmsg_type = config.get("rtmsg_type", "http")  # 默认为 HTTP
-        self.rq_type = config.get("rq_type", "http")  # 默认为 HTTP ，这玩意还没写好，别用
+        self.rq_type = config.get("rq_type", "http")  # 默认为 HTTP
 
         self.rt_http_prot = config.get("rt_http_prot", 18080)  # HTTP 上报消息接收端口
         self.rq_http_url = config.get("rq_http_url")    # HTTP api 请求地址
@@ -129,9 +129,11 @@ class Bot:
 
     async def websocket_server(self):
         # 正向 WebSocket 消息接收服务器
-        logger.info(f"\n\n尝试连接到 WebSocket 地址: {self.f_ws_url}")
+        logger.info("消息接收服务器启动中...")
+        logger.info(f"尝试连接到 WebSocket 地址: {self.f_ws_url}")
         try:
             async with websockets.connect(self.f_ws_url, extra_headers={"Authorization": f"Bearer {self.token}"}) as websocket:
+                logger.info(f"\n\n成功连接到 WebSocket 地址: {self.f_ws_url}\n\n开始接收消息\n")
                 while True:
                     message = await websocket.recv()  # 接收消息
                     
