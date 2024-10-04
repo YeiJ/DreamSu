@@ -168,7 +168,7 @@ class Bot:
                         if data.get('post_type') == 'meta_event':
                             logger.debug("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
                         else:
-                            logger.info("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
+                            logger.info("- - -收到 WebSocket 消息- - -\n%s ", extracted_info)
                         
                         # 处理消息
                         await self.handle_message(data)
@@ -188,7 +188,7 @@ class Bot:
         async def root(request: Request):
             data = await request.json()
             extracted_info = self.extract_message_info(data)
-            logger.info("\n- - -http事件：收到消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
+            logger.info("- - -http事件：收到消息- - -\n%s ", extracted_info)
             await self.handle_message(data)
             return {}
 

@@ -1,9 +1,13 @@
 # bot/api/extract_message_info.py
 
-#消息解析方法
+# 消息解析方法
 
 import logging
 from api.get import get_group_info
+from colorama import Fore, Back, Style, init
+
+# 初始化 colorama
+init(autoreset=True)
 
 logger = logging.getLogger("DreamSu")
 
@@ -36,7 +40,7 @@ def extract_message_info(self, message):
             interval = message.get('interval', '未知心跳间隔')
 
             result = (
-                f"[心跳事件] "
+                f"[{Fore.GREEN}心跳事件{Style.RESET_ALL}] "
                 f"在线状态: {online_status} "
                 f"健康状态: {good_status} "
                 f"心跳间隔: {interval} ms"
@@ -47,14 +51,14 @@ def extract_message_info(self, message):
             sub_type = message.get('sub_type', '未知子类型')
 
             result = (
-                "[生命周期事件] "
+                f"[{Fore.YELLOW}生命周期事件{Style.RESET_ALL}] "
                 f"子类型: {sub_type}"
             )
             message_content.append(result)
 
         return '\n'.join(message_content)  # 直接返回 meta_event 消息的内容
 
-    #消息类型判断
+    # 消息类型判断
     if message.get('post_type') == 'notice':
         notice_type = message.get('notice_type', '未知通知类型')
         
@@ -74,7 +78,7 @@ def extract_message_info(self, message):
                 group_name = group_info.get('group_name', '未找到群名称')
 
             result = (
-                f"[群消息撤回] "
+                f"[{Fore.RED}群消息撤回{Style.RESET_ALL}] "
                 f"操作用户ID: {operator_id} "
                 f"被撤回用户ID: {user_id} "
                 f"群ID: {group_id} "
@@ -88,7 +92,7 @@ def extract_message_info(self, message):
             message_id = message.get('message_id', '未知消息ID')
 
             result = (
-                f"[好友消息撤回] "
+                f"[{Fore.RED}好友消息撤回{Style.RESET_ALL}] "
                 f"用户ID: {user_id} "
                 f"被撤回消息ID: {message_id}"
             )
@@ -101,7 +105,7 @@ def extract_message_info(self, message):
             user_id = message.get('user_id', '未知用户ID')
 
             result = (
-                f"[新成员入群] "
+                f"[{Fore.GREEN}新成员入群{Style.RESET_ALL}] "
                 f"操作用户ID: {operator_id} "
                 f"操作类型: {sub_type} "
                 f"群ID: {group_id} "
@@ -113,14 +117,12 @@ def extract_message_info(self, message):
             message_content.append(f"未知通知类型: {notice_type}")
             return f"[原始消息内容] \n {message}"
 
-
     elif 'message' in message:
         for item in message['message']:
             data = item.get('data', {})
             content_type = item.get('type', '未知类型')
             if content_type == 'text':
                 message_content.append(data.get('text', ''))
-                # return f"原始消息内容: \n {message}"
             elif content_type == 'at':
                 at_info = f"@{data.get('name', '未知用户')} (QQ: {data.get('qq', '未知QQ号')})"
                 message_content.append(at_info)
@@ -152,7 +154,7 @@ def extract_message_info(self, message):
     # 检查是否为主人消息
     admin_marker = ""
     if self.is_admin(user_id):
-        admin_marker = "\033[1;33m ༺ཌༀMasterༀད༻ \033[0m" 
+        admin_marker = f"{Fore.YELLOW}༺ཌༀMasterༀད༻{Style.RESET_ALL}" 
 
     # 消息类型映射
     message_type_map = {
@@ -163,11 +165,9 @@ def extract_message_info(self, message):
     message_type_description = message_type_map.get(message_type, '未知类型')
 
     if message_type == 'group':
-
         group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
 
         if group_info is None:
-            # 处理 group_info 为 None 的情况
             logger.debug(f"获取的 group_info: {group_info}")
             logger.debug("group_info 为 None，无法提取信息")
             group_name = 'group_info 为 None'
@@ -175,15 +175,15 @@ def extract_message_info(self, message):
             logger.debug(f"获取的 group_info: {group_info}")
             group_name = group_info.get('group_name', '未找到群名称')  
             
-        #是否有群名片
+        # 是否有群名片
         if card:
             nickname = nickname + f"(群名片：{card})"
 
         # 消息类型映射
         role_type_map = {
             'member': '普通群员',
-            'owner': '\033[1m群主\033[0m',
-            'admin': '\033[1m管理员\033[0m',
+            'owner': f"{Fore.MAGENTA}群主{Style.RESET_ALL}",
+            'admin': f"{Fore.CYAN}管理员{Style.RESET_ALL}",
             None: '未知身份'
         } 
 
@@ -192,15 +192,15 @@ def extract_message_info(self, message):
 
         # 格式化输出
         result = (
-            f"[ \033[44m{message_type_description}\033[0m ] "   # 消息类型
-            f"  {group_name} ( \033[36m{group_id}\033[0m ) 消息ID: {message_id}\n"    # 群聊信息
+            f"[ {Back.BLUE}{message_type_description}{Style.RESET_ALL} ] "   # 消息类型
+            f"  {group_name} ( {Fore.CYAN}{group_id}{Style.RESET_ALL} ) 消息ID: {message_id}\n"    # 群聊信息
             f"|| {nickname} (ID: {user_id}) ] {admin_marker}\n" # 用户信息
             f">> {' '.join(message_content) or raw_message}\n" # 内容
         )
     elif message_type == 'private':
         # 格式化输出
         result = (
-            f"[ \033[44m{message_type_description}\033[0m ] "   # 消息类型
+            f"[ {Back.BLUE}{message_type_description}{Style.RESET_ALL} ] "   # 消息类型
             f"|| {nickname} (ID: {user_id}) 消息ID: {message_id}  {admin_marker}\n" # 用户信息
             f">> {' '.join(message_content) or raw_message}\n" # 内容
         )
