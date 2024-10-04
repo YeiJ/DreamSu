@@ -3,7 +3,6 @@
 # 消息解析方法
 
 import logging
-from api.get import get_group_info
 from colorama import Fore, Back, Style, init
 
 # 初始化 colorama
@@ -20,7 +19,6 @@ def extract_message_info(self, message):
     card = sender.get('card', "未知名片")
     role = sender.get('role', '未知群员身份')
     message_type = message.get('message_type', '未知类型')
-    raw_message = message.get('raw_message', '没有 raw_message ')
     group_id = message.get('group_id', '未知群ID')
     group_info = None   
 

@@ -203,7 +203,18 @@ class Bot:
             data = await request.json()
             extracted_info = self.extract_message_info(data)
             logger.info("- - -http事件：收到消息- - -\n%s ", extracted_info)
-            await self.handle_message(data)
+            try:
+                await self.handle_message(data)
+            except json.JSONDecodeError:
+                logger.error("无法解析 http 消息的 JSON 数据")
+            except KeyError as e:
+                if str(e) == "'raw_message'":
+                    logger.debug("收到的消息中缺少 'raw_message' 字段")
+                else:
+                    logger.error(f"处理 http 消息时出错: {e}")
+            except Exception as e:
+                logger.error(f"处理 http 消息时出错: {e}")
+
             return {}
 
     async def handle_message(self, message):
@@ -219,9 +230,6 @@ class Bot:
             else:
                 logger.warning("消息丢失，可能被撤回")
                 return
-            
-        else:
-            logger.debug("该消息没有 raw_message")
         
         semaphore = asyncio.Semaphore(200)  # 限制并发处理任务数量为200
         await self.plugin_manager.dispatch_message(message, semaphore)
