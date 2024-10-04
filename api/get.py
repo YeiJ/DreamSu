@@ -214,7 +214,7 @@ def get_friend_list(base_url, token=None):
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                logger.info("获取好友列表成功")
+                logger.debug("获取好友列表成功")
                 return data
             else:
                 print("API 返回错误:", data.get("msg"))
@@ -281,7 +281,7 @@ def get_group_list(base_url, token=None):
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                logger.info("获取群列表成功")
+                logger.debug("获取群列表成功")
                 return data
             else:
                 print("API 返回错误:", data.get("msg"))
