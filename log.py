@@ -28,6 +28,11 @@ def write_log_async(logger, message, level):
 
 def setup_logging():
     """设置日志记录"""
+    
+    # 确保启用ANSI转义码（仅在Windows上）
+    if os.name == 'nt':
+        import msvcrt
+        msvcrt.kbhit()
 
     # 读取配置文件中的日志级别
     config_path = "config/config.json"

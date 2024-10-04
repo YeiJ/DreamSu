@@ -36,10 +36,10 @@ def extract_message_info(self, message):
             interval = message.get('interval', '未知心跳间隔')
 
             result = (
-                f"心跳事件:\n"
-                f"在线状态: {online_status}\n"
-                f"健康状态: {good_status}\n"
-                f"心跳间隔: {interval} ms\n"
+                f"[心跳事件] "
+                f"在线状态: {online_status} "
+                f"健康状态: {good_status} "
+                f"心跳间隔: {interval} ms"
             )
             message_content.append(result)
 
@@ -47,8 +47,8 @@ def extract_message_info(self, message):
             sub_type = message.get('sub_type', '未知子类型')
 
             result = (
-                f"生命周期事件:\n"
-                f"子类型: {sub_type}\n"
+                "[生命周期事件] "
+                f"子类型: {sub_type}"
             )
             message_content.append(result)
 
@@ -64,22 +64,21 @@ def extract_message_info(self, message):
             group_id = message.get('group_id', '未知群ID')
             message_id = message.get('message_id', '未知消息ID')
 
-            # group_info = get_group_info(self.base_url, group_id, no_cache=False, token=self.token)  
+            group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
             logger.debug(f"获取的 group_info: {group_info}")  
+            
             if group_info is None:
-                # 处理 group_info 为 None 的情况
                 logger.debug("group_info 为 None，无法提取信息")  
-                # group_name = 'None'
-                group_name = '由于性能问题，暂时下线群名称显示'
+                group_name = '#'
             else:
-                group_name = group_info['data']['group_name']
+                group_name = group_info.get('group_name', '未找到群名称')
 
             result = (
-                f"群消息撤回通知:\n"
-                f"操作用户ID: {operator_id}\n"
-                f"被撤回用户ID: {user_id}\n"
-                f"群ID: {group_id}\n"
-                f"群名称: {group_name}\n"
+                f"[群消息撤回] "
+                f"操作用户ID: {operator_id} "
+                f"被撤回用户ID: {user_id} "
+                f"群ID: {group_id} "
+                f"群名称: {group_name} "
                 f"被撤回消息ID: {message_id}"
             )
             message_content.append(result)
@@ -89,8 +88,8 @@ def extract_message_info(self, message):
             message_id = message.get('message_id', '未知消息ID')
 
             result = (
-                f"好友消息撤回通知:\n"
-                f"用户ID: {user_id}\n"
+                f"[好友消息撤回] "
+                f"用户ID: {user_id} "
                 f"被撤回消息ID: {message_id}"
             )
             message_content.append(result)
@@ -102,17 +101,17 @@ def extract_message_info(self, message):
             user_id = message.get('user_id', '未知用户ID')
 
             result = (
-                f"新成员入群通知:\n"
-                f"操作用户ID: {operator_id}\n"
-                f"操作类型: {sub_type}\n"
-                f"群ID: {group_id}\n"
+                f"[新成员入群] "
+                f"操作用户ID: {operator_id} "
+                f"操作类型: {sub_type} "
+                f"群ID: {group_id} "
                 f"新成员用户ID: {user_id}"
             )
             message_content.append(result)
 
         else:
             message_content.append(f"未知通知类型: {notice_type}")
-            return f"原始消息内容: \n {message}"
+            return f"[原始消息内容] \n {message}"
 
 
     elif 'message' in message:
@@ -153,7 +152,7 @@ def extract_message_info(self, message):
     # 检查是否为主人消息
     admin_marker = ""
     if self.is_admin(user_id):
-        admin_marker = "\033[1;33m \n      ༺ཌༀMasterༀད༻\033[0m" 
+        admin_marker = "\033[1;33m ༺ཌༀMasterༀད༻ \033[0m" 
 
     # 消息类型映射
     message_type_map = {
@@ -164,16 +163,18 @@ def extract_message_info(self, message):
     message_type_description = message_type_map.get(message_type, '未知类型')
 
     if message_type == 'group':
-        # group_info = get_group_info(self.base_url, group_id, no_cache=True, token=self.token)  
-        
+
+        group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
+
         if group_info is None:
             # 处理 group_info 为 None 的情况
-            logger.debug("group_info 为 None，无法提取信息")  
-            group_name = '由于性能问题，暂时下线群名称显示'
+            logger.debug(f"获取的 group_info: {group_info}")
+            logger.debug("group_info 为 None，无法提取信息")
+            group_name = 'group_info 为 None'
         else:
-            logger.debug(f"获取的 group_info: {group_info}")  
-            group_name = group_info['data']['group_name']
-        
+            logger.debug(f"获取的 group_info: {group_info}")
+            group_name = group_info.get('group_name', '未找到群名称')  
+            
         #是否有群名片
         if card:
             nickname = nickname + f"(群名片：{card})"
@@ -181,28 +182,27 @@ def extract_message_info(self, message):
         # 消息类型映射
         role_type_map = {
             'member': '普通群员',
-            'owner': '群主',
+            'owner': '\033[1m群主\033[0m',
+            'admin': '\033[1m管理员\033[0m',
             None: '未知身份'
         } 
 
-        role_type_description = role_type_map.get(role, '管理员 ？')
+        role_type_description = role_type_map.get(role, '未知身份')
         nickname = role_type_description + " || " + nickname
 
         # 格式化输出
         result = (
-            f"消息类型: {message_type_description}\n"
-            f"群聊: ID: {group_id} ({group_name})\n"
-            f"用户: {nickname} (ID: {user_id}){admin_marker}\n"
-            f"内容: {' '.join(message_content) or raw_message}\n"
-            f"消息ID: {message_id}\n"
+            f"[ \033[44m{message_type_description}\033[0m ] "   # 消息类型
+            f"  {group_name} ( \033[36m{group_id}\033[0m ) 消息ID: {message_id}\n"    # 群聊信息
+            f"|| {nickname} (ID: {user_id}) ] {admin_marker}\n" # 用户信息
+            f">> {' '.join(message_content) or raw_message}\n" # 内容
         )
     elif message_type == 'private':
         # 格式化输出
         result = (
-            f"消息类型: {message_type_description}\n"
-            f"用户: {nickname} (ID: {user_id}){admin_marker}\n"
-            f"内容: {' '.join(message_content) or raw_message}\n"
-            f"消息ID: {message_id}\n"
+            f"[ \033[44m{message_type_description}\033[0m ] "   # 消息类型
+            f"|| {nickname} (ID: {user_id}) 消息ID: {message_id}  {admin_marker}\n" # 用户信息
+            f">> {' '.join(message_content) or raw_message}\n" # 内容
         )
 
     return result

@@ -27,7 +27,7 @@ class Bot:
         
         self.bot_version = dreamsu.get("bot_version")
 
-        #连接配置
+        # 连接配置
         self.rtmsg_type = config.get("rtmsg_type", "http")  # 默认为 HTTP
         self.rq_type = config.get("rq_type", "http")  # 默认为 HTTP
 
@@ -37,10 +37,15 @@ class Bot:
         self.r_ws_port = config.get("r_ws_port", 18081) # 反向 ws 端口
         self.f_ws_url = config.get("f_ws_url")  # 正向 ws 连接地址
 
-        #临时兼容旧的连接配置
+        # 临时兼容旧的连接配置
         self.base_url = config.get("rq_http_url")
 
+        # 口令
         self.token = config.get("token")
+
+        # 初始化好友列表和群列表
+        self.friend_list = []  # 存储好友列表
+        self.group_list = []   # 存储群列表
         
         # 实例化插件管理器
         self.plugin_manager = PluginManager(self)
@@ -59,11 +64,26 @@ class Bot:
 
         self.create_routes()
 
-    def start(self):
+    async def start(self):
         logger.info("DreamSuOB启动中...")
         logger.info(f"\n\n\n当前版本: {self.bot_version}\n\n")
         logger.info(f"主人账号: {self.master_ids}")
-        logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||")
+        
+        logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||\n")
+
+        # 更新好友列表和群列表
+        logger.info("正在加载好友列表...")
+        new_friends, removed_friends, len_friends = self.update_friend_list()
+        logger.info(f"加载成功 {len_friends} 个好友\n")
+        logger.info("正在加载群列表...")
+        new_groups, removed_groups, len_groups = self.update_group_list()
+        logger.info(f"加载成功 {len_groups} 个群聊\n")
+
+        # 启动异步更新任务
+        asyncio.create_task(self.schedule_updates())
+
+        logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||\n")
+
         self.plugin_manager.load_plugins('plugins', 'plugins/example')  # 加载插件
         
         async def main():
@@ -83,7 +103,7 @@ class Bot:
 
             await asyncio.gather(*tasks)  # 并发运行所有任务
 
-        asyncio.run(main())  # 启动主事件循环
+        await main()  # 启动主事件循环
 
     def load_api_methods(self, directory):
         """动态加载指定目录下的所有.py文件中的函数，并将其添加到当前类的实例"""
@@ -133,7 +153,7 @@ class Bot:
         logger.info(f"尝试连接到 WebSocket 地址: {self.f_ws_url}")
         try:
             async with websockets.connect(self.f_ws_url, extra_headers={"Authorization": f"Bearer {self.token}"}) as websocket:
-                logger.info(f"\n\n成功连接到 WebSocket 地址: {self.f_ws_url}\n\n开始接收消息\n")
+                logger.info(f"\n\n成功连接到常规机器人 WebSocket 地址: {self.f_ws_url}\n\n开始接收消息\n")
                 while True:
                     message = await websocket.recv()  # 接收消息
                     
@@ -176,11 +196,33 @@ class Bot:
         # 分发消息给插件管理器
         if 'raw_message' not in message:
             if 'meta_event_type' in message:
-                logger.debug(f"心跳事件")
+                logger.debug("心跳事件")
                 return
+
+            if message.get('post_type') == 'notice':
+                if 'recall' in message.get('notice_type', ''):
+                    logger.debug("消息被撤回")
             else:
-                logger.warning(f"消息丢失，可能被撤回")
+                logger.warning("消息丢失，可能被撤回")
                 return
+            
+        else:
+            logger.debug("该消息没有 raw_message")
         
         semaphore = asyncio.Semaphore(200)  # 限制并发处理任务数量为200
         await self.plugin_manager.dispatch_message(message, semaphore)
+
+    async def schedule_updates(self):
+        # 异步定时任务
+        async def update_friends():
+            while True:
+                await self.update_friend_list()
+                await asyncio.sleep(60)  # 每1分钟更新好友列表
+
+        async def update_groups():
+            while True:
+                await self.update_group_list()
+                await asyncio.sleep(300)  # 每5分钟更新群列表
+
+        # 启动并行任务
+        await asyncio.gather(update_friends(), update_groups())
