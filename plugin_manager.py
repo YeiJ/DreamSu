@@ -21,7 +21,7 @@ class PluginManager:
         self.failedloaded_plugins = []  # 加载失败的插件
         self.bot.pm_status = 1  # 插件管理器加载状态
 
-    def load_plugins(self, folder_plugin_folder, file_plugin_folder):
+    async def load_plugins(self, folder_plugin_folder, file_plugin_folder):
         """加载插件，包括文件夹插件和单文件插件"""
         logger.info("正在启动插件管理器...")
 
@@ -33,17 +33,10 @@ class PluginManager:
         # 忽略文件列表
         ignore_files = {"__init__.py", "__pycache__"}
 
-        # 启动一个事件循环来运行异步任务
-        loop = asyncio.get_event_loop()
+        # 按顺序加载插件
+        await self._sequentially_load_plugins(folder_plugin_folder, file_plugin_folder, ignore_files)
 
-        if loop.is_running():
-            # 如果事件循环已经运行，直接按顺序创建任务
-            loop.create_task(self._sequentially_load_plugins(folder_plugin_folder, file_plugin_folder, ignore_files))
-        else:
-            # 启动新的事件循环并按顺序加载插件
-            loop.run_until_complete(self._sequentially_load_plugins(folder_plugin_folder, file_plugin_folder, ignore_files))
-
-        # 生成插件的可序列化版本，仅保留插件的基本信息
+        # 生成插件的可序列化版本
         serializable_plugins = {
             "folder_plugins": {
                 name: {"enable": data["enable"], "version": data["version"]}
@@ -63,27 +56,26 @@ class PluginManager:
         self.bot.pm_list = serializable_plugins
 
         # 插件加载状态日志
+        self.log_plugin_status()
+
+        self.bot.pm_status = 2  # 加载完成
+
+    def log_plugin_status(self):
+        """输出插件加载状态日志"""
+        logger.info("-----------------------------||")
         if not self.unloaded_plugins:
-            logger.info("\n\n")
-            logger.info("-----------------------------||")
             logger.info("✔️ 所有插件均已成功加载")
-            logger.info("-----------------------------||")
         else:
-            logger.info("\n\n")
             logger.info("▷▷--------------------------||")
             if self.unloaded_plugins and not self.failedloaded_plugins:
                 logger.info("📋 已卸载的插件名单: %s", ', '.join(self.unloaded_plugins))
-                logger.info("-----------------------------||")
+                logger.info("✔️ 所有插件均已成功加载")
             elif self.failedloaded_plugins and not self.unloaded_plugins:
                 logger.info("❌ 加载失败的插件名单: %s", ', '.join(self.failedloaded_plugins))
-                logger.info("-----------------------------||")
             elif self.unloaded_plugins and self.failedloaded_plugins:
                 logger.info("📋 已卸载的插件名单: %s", ', '.join(self.unloaded_plugins))
-                logger.info("-----------------------------||")
                 logger.info("❌ 加载失败的插件名单: %s", ', '.join(self.failedloaded_plugins))
-                logger.info("-----------------------------||")
-
-        self.bot.pm_status = 2  # 加载完成
+        logger.info("-----------------------------||")
 
     async def _sequentially_load_plugins(self, folder_plugin_folder, file_plugin_folder, ignore_files):
         """按顺序加载文件夹插件和单文件插件"""
@@ -93,8 +85,8 @@ class PluginManager:
         # 然后加载单文件插件
         await self._load_file_plugins(file_plugin_folder, ignore_files)
 
-        logger.info("-----------------------------||\n\n")
-        logger.info("开始后加载...\n\n")
+        logger.info("-----------------------------||")
+        logger.info("后加载...\n")
 
     async def _load_folder_plugins(self, folder_plugin_folder, ignore_files):
         logger.info(f"\n\n##########\n加载文件夹插件目录: {folder_plugin_folder}\n##########\n")
@@ -117,12 +109,12 @@ class PluginManager:
                 module_path = f"plugins.{filename}.main"
                 if await self._load_plugin(module_path, filename):
                     logger.info(f"✔️ 插件📁 {filename} 加载成功，版本 {version}")
-                    logger.info("-----------------------------\n")
+                    logger.info("-----------------------------")
                 else:
                     self.failedloaded_plugins.append(filename)
                     logger.error(f"❌ 插件 {filename} 加载失败，版本 {version}")
                     # logger.error(traceback.format_exc())  # 打印完整的错误堆栈
-                    logger.info("-----------------------------\n")
+                    logger.info("-----------------------------")
 
     async def _load_file_plugins(self, file_plugin_folder, ignore_files):
         logger.info(f"\n\n##########\n加载单文件插件目录: {file_plugin_folder}\n##########\n")
@@ -151,12 +143,12 @@ class PluginManager:
 
             if await self._load_plugin(module_path, plugin_name):
                 logger.info(f"✔️ 插件📄 {plugin_name} 加载成功，版本 {version}")
-                logger.info("-----------------------------\n")
+                logger.info("-----------------------------")
             else:
                 self.failedloaded_plugins.append(plugin_name)
                 logger.error(f"❌ 插件📄 {plugin_name} 加载失败，版本 {version}")
                 logger.error(traceback.format_exc())  # 打印完整的错误堆栈
-                logger.info("-----------------------------\n")
+                logger.info("-----------------------------")
 
     async def _load_plugin(self, module_path, plugin_name):
         """加载插件并实例化插件类"""

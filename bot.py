@@ -73,10 +73,10 @@ class Bot:
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
-        new_friends, removed_friends, len_friends = self.update_friend_list()
+        new_friends, removed_friends, len_friends = await self.update_friend_list()
         logger.info(f"加载成功 {len_friends} 个好友\n")
         logger.info("正在加载群列表...")
-        new_groups, removed_groups, len_groups = self.update_group_list()
+        new_groups, removed_groups, len_groups = await self.update_group_list()
         logger.info(f"加载成功 {len_groups} 个群聊\n")
 
         # 启动异步更新任务
@@ -84,7 +84,7 @@ class Bot:
 
         logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||\n")
 
-        self.plugin_manager.load_plugins('plugins', 'plugins/example')  # 加载插件
+        await self.plugin_manager.load_plugins('plugins', 'plugins/example')  # 加载插件
         
         async def main():
             if self.rtmsg_type == "ws":

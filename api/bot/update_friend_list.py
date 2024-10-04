@@ -3,7 +3,7 @@ import yaml
 
 from api.get import get_friend_list
 
-def update_friend_list(self):
+async def update_friend_list(self):
     # 获取好友列表
     friend_data = get_friend_list(self.base_url, self.token)
     friends = {friend['user_id']: friend for friend in friend_data['data']}

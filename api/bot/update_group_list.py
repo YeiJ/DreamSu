@@ -3,7 +3,7 @@ import yaml
 
 from api.get import get_group_list
 
-def update_group_list(self):
+async def update_group_list(self):
     # 获取群列表
     group_data = get_group_list(self.base_url, self.token)
     groups = {group['group_id']: group for group in group_data['data']}
