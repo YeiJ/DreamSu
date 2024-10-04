@@ -1,4 +1,7 @@
 import requests
+import logging
+
+logger = logging.getLogger("api.get")
 
 def get_msg(base_url, message_id, token=None):
     """
@@ -211,7 +214,7 @@ def get_friend_list(base_url, token=None):
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                print("获取好友列表成功")
+                logger.info("获取好友列表成功")
                 return data
             else:
                 print("API 返回错误:", data.get("msg"))
@@ -278,7 +281,7 @@ def get_group_list(base_url, token=None):
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                print("获取群列表成功")
+                logger.info("获取群列表成功")
                 return data
             else:
                 print("API 返回错误:", data.get("msg"))
