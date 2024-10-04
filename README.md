@@ -49,10 +49,10 @@ DreamSu 意为苏梦，我的很多项目都叫这个名字。
 
 目前已实现
 - [x] HTTP API
-- [x] 反向 HTTP POST
 - [x] 正向 WebSocket
 
 以下接口将会逐步适配，但不是现在 ~~（写不会了~~
+- [x] 反向 HTTP POST
 - [x] 反向 WebSocket
 
 ## 安装
