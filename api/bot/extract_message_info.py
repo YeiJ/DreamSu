@@ -20,7 +20,7 @@ def extract_message_info(self, message):
     card = sender.get('card', "未知名片")
     role = sender.get('role', '未知群员身份')
     message_type = message.get('message_type', '未知类型')
-    raw_message = message.get('raw_message', '')
+    raw_message = message.get('raw_message', '没有 raw_message ')
     group_id = message.get('group_id', '未知群ID')
     group_info = None   
 
@@ -113,6 +113,86 @@ def extract_message_info(self, message):
             )
             message_content.append(result)
 
+        elif notice_type == 'notify':
+            sub_type = message.get('sub_type', '未知子类型')
+            target_id = message.get('target_id', '未知目标用户ID')
+            user_id = message.get('user_id', '未知用户ID')
+            raw_info = message.get('raw_info', [])
+
+            # 解析 raw_info
+            interaction_details = []
+            for info in raw_info:
+                """ 
+                if info.get('type') == 'qq':
+                    uid = info.get('uid', '未知QQ号')
+                    interaction_details.append(f"QQ用户: {uid}")
+                elif info.get('type') == 'img':
+                    img_src = info.get('src', '未知图片链接')
+                    interaction_details.append(f"图标: {img_src}")
+                el """
+                if info.get('type') == 'nor':
+                    txt = info.get('txt', '未知内容')
+                    interaction_details.append(txt)
+
+            interaction_details_str = ', '.join(interaction_details)
+
+            # 根据目标ID判断是群消息还是私聊消息
+            if target_id == self.bot_info.get('user_id'):  # 私聊消息
+                result = (
+                    f"[{Fore.BLUE}好友互动消息{Style.RESET_ALL}] "
+                    f"发起用户ID: {user_id} "
+                    f"目标用户ID: {target_id} \n"
+                    f"互动类型: {interaction_details_str}"
+                )
+            else:  # 群消息
+                group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
+                logger.debug(f"获取的 group_info: {group_info}")  
+
+                if group_info is None:
+                    logger.debug("group_info 为 None，无法提取信息")  
+                    group_name = '未知群名称'
+                else:
+                    group_name = group_info.get('group_name', '未找到群名称')
+
+                result = (
+                    f"[{Fore.GREEN}群互动消息{Style.RESET_ALL}] "
+                    f"群ID: {target_id} "
+                    f"群名称: {group_name} \n"
+                    f"发起用户ID: {user_id} "
+                    f"目标用户ID: {target_id} \n"
+                    f"互动类型: {interaction_details_str}"
+                )
+
+            message_content.append(result)
+        
+        elif notice_type == 'group_upload':
+            user_id = message.get('user_id', '未知用户ID')
+            group_id = message.get('group_id', '未知群ID')
+            file_info = message.get('file', {})
+            file_id = file_info.get('id', '未知文件ID')
+            file_name = file_info.get('name', '未知文件名')
+            file_size = file_info.get('size', '未知文件大小')
+
+            group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
+            logger.debug(f"获取的 group_info: {group_info}")
+
+            if group_info is None:
+                logger.debug("group_info 为 None，无法提取信息")
+                group_name = '未找到群名称'
+            else:
+                group_name = group_info.get('group_name', '未找到群名称')
+
+            result = (
+                f"[{Fore.GREEN}群文件上传{Style.RESET_ALL}] "
+                f"群ID: {group_id} "
+                f"群名称: {group_name} ||"
+                f"上传用户ID: {user_id} \n"
+                f"文件ID: {file_id} "
+                f"文件大小: {file_size} bytes \n"
+                f"文件名: {file_name} "
+            )
+            message_content.append(result)
+
         else:
             message_content.append(f"未知通知类型: {notice_type}")
             return f"[原始消息内容] \n {message}"
@@ -195,14 +275,14 @@ def extract_message_info(self, message):
             f"[ {Back.BLUE}{message_type_description}{Style.RESET_ALL} ] "   # 消息类型
             f"  {group_name} ( {Fore.CYAN}{group_id}{Style.RESET_ALL} ) 消息ID: {message_id}\n"    # 群聊信息
             f"|| {nickname} (ID: {user_id}) ] {admin_marker}\n" # 用户信息
-            f">> {' '.join(message_content) or raw_message}\n" # 内容
+            f">> {' '.join(message_content) }\n" # 内容
         )
     elif message_type == 'private':
         # 格式化输出
         result = (
             f"[ {Back.BLUE}{message_type_description}{Style.RESET_ALL} ] "   # 消息类型
             f"|| {nickname} (ID: {user_id}) 消息ID: {message_id}  {admin_marker}\n" # 用户信息
-            f">> {' '.join(message_content) or raw_message}\n" # 内容
+            f">> {' '.join(message_content) }\n" # 内容
         )
 
     return result

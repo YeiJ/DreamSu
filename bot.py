@@ -55,6 +55,9 @@ class Bot:
 
         # 读取配置文件中的主人ID
         self.master_ids = config.get('masters', [])
+
+        # 机器人基本信息
+        self.bot_info = {} 
         
         # 初始化FastAPI
         self.app = FastAPI()
@@ -70,6 +73,12 @@ class Bot:
         logger.info(f"主人账号: {self.master_ids}")
         
         logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||\n")
+
+        from api.get import get_login_info
+        logger.info("正在获取bot账号信息...")
+        self.bot_info = get_login_info(self.base_url, self.token)
+        logger.info(f"账号: {self.bot_info.get('user_id')} \n")
+        logger.info(f"昵称: {self.bot_info.get('nickname')} \n")
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
@@ -174,6 +183,11 @@ class Bot:
                         await self.handle_message(data)
                     except json.JSONDecodeError:
                         logger.error("无法解析 WebSocket 消息的 JSON 数据")
+                    except KeyError as e:
+                        if str(e) == "'raw_message'":
+                            logger.debug("收到的消息中缺少 'raw_message' 字段")
+                        else:
+                            logger.error(f"处理 WebSocket 消息时出错: {e}")
                     except Exception as e:
                         logger.error(f"处理 WebSocket 消息时出错: {e}")
 
