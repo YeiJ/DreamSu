@@ -69,16 +69,16 @@ class Bot:
 
     async def start(self):
         logger.info("DreamSuOB启动中...")
-        logger.info(f"\n\n\n当前版本: {self.bot_version}\n\n")
+        logger.info(f"当前版本: {self.bot_version}")
         logger.info(f"主人账号: {self.master_ids}")
         
-        logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||\n")
+        logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||")
 
         from api.get import get_login_info
         logger.info("正在获取bot账号信息...")
         self.bot_info = get_login_info(self.base_url, self.token)
-        logger.info(f"账号: {self.bot_info.get('user_id')} \n")
-        logger.info(f"昵称: {self.bot_info.get('nickname')} \n")
+        logger.info(f"账号: {self.bot_info.get('user_id')} ")
+        logger.info(f"昵称: {self.bot_info.get('nickname')} ")
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
@@ -86,7 +86,7 @@ class Bot:
         logger.info(f"加载成功 {len_friends} 个好友\n")
         logger.info("正在加载群列表...")
         new_groups, removed_groups, len_groups = await self.update_group_list()
-        logger.info(f"加载成功 {len_groups} 个群聊\n")
+        logger.info(f"加载成功 {len_groups} 个群聊")
 
         # 启动异步更新任务
         asyncio.create_task(self.schedule_updates())
@@ -118,7 +118,8 @@ class Bot:
         """动态加载指定目录下的所有.py文件中的函数，并将其添加到当前类的实例"""
         logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||")
         if directory == "api":
-            logger.info("正在加载OBv11方法...")
+            logger.warning("请不要这样做！")
+            return
         else:
             logger.info("正在加载框架内部方法...")
         logger.debug(" ")
@@ -143,7 +144,7 @@ class Bot:
                     logger.debug(f"成功加载方法: {name} 来自模块: {module_name}")
 
         if directory == "api":
-            logger.info("OBv11方法加载完毕")
+            logger.warning("雪豹闭嘴")
         else:
             logger.info("框架内部方法加载完毕")
         logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||")
@@ -152,7 +153,13 @@ class Bot:
         # 启动 HTTP 消息接收服务器
         logger.info("消息接收服务器启动中...")
         import uvicorn  # type: ignore
-        config = uvicorn.Config(self.app, host="0.0.0.0", port=self.rt_http_prot, workers=4)
+        config = uvicorn.Config(
+            self.app,
+            host="0.0.0.0",
+            port=self.rt_http_prot,
+            workers=4,
+            log_level="critical"  # 仅记录严重错误
+        )
         server = uvicorn.Server(config)
         await server.serve()
 
@@ -162,7 +169,7 @@ class Bot:
         logger.info(f"尝试连接到 WebSocket 地址: {self.f_ws_url}")
         try:
             async with websockets.connect(self.f_ws_url, extra_headers={"Authorization": f"Bearer {self.token}"}) as websocket:
-                logger.info(f"\n\n成功连接到常规机器人 WebSocket 地址: {self.f_ws_url}\n\n开始接收消息\n")
+                logger.info(f"\n\n成功连接到OneBot WebSocket 地址: {self.f_ws_url}\n\n开始接收消息\n")
                 while True:
                     message = await websocket.recv()  # 接收消息
                     
@@ -177,7 +184,7 @@ class Bot:
                         if data.get('post_type') == 'meta_event':
                             logger.debug("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
                         else:
-                            logger.info("- - -收到 WebSocket 消息- - -\n%s ", extracted_info)
+                            logger.info("[WSmsg]%s ", extracted_info)
                         
                         # 处理消息
                         await self.handle_message(data)
@@ -202,7 +209,7 @@ class Bot:
         async def root(request: Request):
             data = await request.json()
             extracted_info = self.extract_message_info(data)
-            logger.info("- - -http事件：收到消息- - -\n%s ", extracted_info)
+            logger.info("[HTTPmsg]%s ", extracted_info)
             try:
                 await self.handle_message(data)
             except json.JSONDecodeError:

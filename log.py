@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import json
 import concurrent.futures
+from colorama import Fore, Style
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
@@ -25,6 +26,22 @@ def write_log_async(logger, message, level):
         logger.warning(message)
     else:
         logger.debug(message)
+
+class ColoredFormatter(logging.Formatter):
+    """自定义格式化器，用于着色日志级别"""
+
+    COLOR_MAPPING = {
+        'INFO': Fore.GREEN,
+        'ERROR': Fore.RED,
+        'WARNING': Fore.YELLOW,
+        'DEBUG': Fore.BLUE,
+    }
+
+    def format(self, record):
+        level_color = self.COLOR_MAPPING.get(record.levelname, Fore.WHITE)
+        record.levelname = f"{level_color}{record.levelname}{Style.RESET_ALL}"
+        return super().format(record)
+
 
 def setup_logging():
     """设置日志记录"""
@@ -89,7 +106,8 @@ def setup_logging():
     # 创建一个 StreamHandler 来同时在控制台输出日志
     console_handler = logging.StreamHandler()
     console_handler.setLevel(log_level)  # 使用配置文件中的日志级别
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    console_handler.setFormatter(ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+
 
     # 确保日志立即写入文件
     file_handler.flush()

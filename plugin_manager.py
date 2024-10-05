@@ -90,6 +90,7 @@ class PluginManager:
 
     async def _load_folder_plugins(self, folder_plugin_folder, ignore_files):
         logger.info(f"\n\n##########\n加载文件夹插件目录: {folder_plugin_folder}\n##########\n")
+        logger.info("-----------------------------")
         for filename in os.listdir(folder_plugin_folder):
             folder_path = os.path.join(folder_plugin_folder, filename)
 
@@ -118,6 +119,7 @@ class PluginManager:
 
     async def _load_file_plugins(self, file_plugin_folder, ignore_files):
         logger.info(f"\n\n##########\n加载单文件插件目录: {file_plugin_folder}\n##########\n")
+        logger.info("-----------------------------")
         for filename in os.listdir(file_plugin_folder):
             if filename in ignore_files or not filename.endswith(".py"):
                 continue
