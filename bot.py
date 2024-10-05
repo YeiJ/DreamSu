@@ -163,6 +163,9 @@ class Bot:
         server = uvicorn.Server(config)
         await server.serve()
 
+        # 服务器启动完成的日志
+        logger.info("HTTP 消息接收服务器已成功启动。")
+
     async def websocket_server(self):
         # 正向 WebSocket 消息接收服务器
         logger.info("消息接收服务器启动中...")
