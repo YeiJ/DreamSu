@@ -151,7 +151,7 @@ class Bot:
 
     async def http_server(self):
         # 启动 HTTP 消息接收服务器
-        logger.info("消息接收服务器启动中...")
+        logger.info("消息接收服务器启动中...\n")
         import uvicorn  # type: ignore
         config = uvicorn.Config(
             self.app,
