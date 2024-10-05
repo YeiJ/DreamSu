@@ -151,7 +151,7 @@ class Bot:
 
     async def http_server(self):
         # 启动 HTTP 消息接收服务器
-        logger.info("消息接收服务器启动中...\n")
+        logger.info("消息接收服务器启动中...")
         import uvicorn  # type: ignore
         config = uvicorn.Config(
             self.app,
@@ -161,7 +161,7 @@ class Bot:
             log_level="critical"  # 仅记录严重错误
         )
         server = uvicorn.Server(config)
-        logger.info("HTTP 消息接收服务器已成功启动。")
+        logger.info("HTTP 消息接收服务器已成功启动。\n")
         await server.serve()
 
 
