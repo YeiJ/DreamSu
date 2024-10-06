@@ -164,6 +164,9 @@ class PluginManager:
                 plugin_instance = plugin_class(self.bot)
                 self.plugins["loaded_plugins"].append(plugin_instance)
                 return True
+        except KeyError as e:
+            if str(e) == "'raw_message'":
+                logger.debug("收到的消息中缺少 'raw_message' 字段")
         except Exception as e:
             # 捕获并记录完整的错误堆栈信息
             error_trace = traceback.format_exc()
@@ -191,16 +194,34 @@ class PluginManager:
                     if len(lines) > 1 and lines[1].startswith('# __version__'):
                         version = lines[1].split('=')[1].strip().strip('"').strip("'")
         return version
-    
+        
     async def dispatch_message(self, message, semaphore):
         """异步分发消息"""
         async with semaphore:
             tasks = []
             for plugin in self.plugins.get("loaded_plugins", []):
                 if hasattr(plugin, 'on_message'):
-                    try:
-                        tasks.append(asyncio.create_task(plugin.on_message(message)))  # 并行处理插件消息
-                    except Exception as e:
-                        logger.error(f"插件处理消息时出错: {e}")
+                    # 使用插件的类名作为任务名称
+                    task = asyncio.create_task(plugin.on_message(message))
+                    task.set_name(plugin.__class__.__name__)  # 设置任务名称为插件类名
+                    tasks.append(task)  # 并行处理插件消息
+            
             if tasks:
-                await asyncio.gather(*tasks)  # 并发执行所有插件的 on_message
+                try:
+                    await asyncio.gather(*tasks)
+                except Exception as e:  # 捕获所有异常
+                    for task in tasks:
+                        if task.done() and task.exception() is not None:
+                            plugin_name = task.get_name()  # 获取任务的名称
+                            if isinstance(task.exception(), KeyError):
+                                logger.debug(f"插件类 {plugin_name} 收到的消息中缺少 'raw_message' 字段")
+                            else:
+                                logger.error(f"插件类 {plugin_name} 处理消息时发生错误: {task.exception()}")
+
+                except Exception as e:
+                    # 记录每个插件的错误
+                    for task in tasks:
+                        if task.done() and task.exception() is not None:
+                            plugin_name = task.get_name()  # 获取任务的名称
+                            logger.error(f"插件类 {plugin_name} 处理消息时出错: \n{task.exception()}")  # 记录出错的插件
+                

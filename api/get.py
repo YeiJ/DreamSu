@@ -147,7 +147,7 @@ def get_group_info(base_url, group_id, no_cache=False, token=None):
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                # print("获取群信息成功")
+                logger.debug("获取群信息成功")
                 print("\n")
                 return data
             else:
@@ -185,7 +185,7 @@ def get_group_member_info(base_url, group_id, user_id, no_cache=False, token=Non
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == "ok":
-                print("获取群成员信息成功")
+                logger.debug("获取群成员信息成功")
                 return data
             else:
                 print("API 返回错误:", data.get("msg"))

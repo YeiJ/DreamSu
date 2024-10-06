@@ -58,6 +58,8 @@ class Bot:
 
         # 机器人基本信息
         self.bot_info = {} 
+        self.bot_id = None
+        self.bot_nickname = None
         
         # 初始化FastAPI
         self.app = FastAPI()
@@ -77,8 +79,10 @@ class Bot:
         from api.get import get_login_info
         logger.info("正在获取bot账号信息...")
         self.bot_info = get_login_info(self.base_url, self.token)
-        logger.info(f"账号: {self.bot_info.get('user_id')} ")
-        logger.info(f"昵称: {self.bot_info.get('nickname')} ")
+        self.bot_id = self.bot_info.get('user_id')
+        self.bot_nickname = self.bot_info.get('nickname')
+        logger.info(f"账号: {self.bot_id} ")
+        logger.info(f"昵称: {self.bot_nickname} ")
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
@@ -192,13 +196,8 @@ class Bot:
                         await self.handle_message(data)
                     except json.JSONDecodeError:
                         logger.error("无法解析 WebSocket 消息的 JSON 数据")
-                    except KeyError as e:
-                        if str(e) == "'raw_message'":
-                            logger.debug("收到的消息中缺少 'raw_message' 字段")
-                        else:
-                            logger.error(f"处理 WebSocket 消息时出错: {e}")
                     except Exception as e:
-                        logger.error(f"处理 WebSocket 消息时出错: {e}")
+                            logger.error(f"处理 WebSocket 消息时出错: {e}")
 
         except Exception as e:
             logger.error(f"WebSocket 连接失败: {e} \n\n5秒\n后重连")
@@ -216,11 +215,6 @@ class Bot:
                 await self.handle_message(data)
             except json.JSONDecodeError:
                 logger.error("无法解析 http 消息的 JSON 数据")
-            except KeyError as e:
-                if str(e) == "'raw_message'":
-                    logger.debug("收到的消息中缺少 'raw_message' 字段")
-                else:
-                    logger.error(f"处理 http 消息时出错: {e}")
             except Exception as e:
                 logger.error(f"处理 http 消息时出错: {e}")
 
@@ -241,7 +235,19 @@ class Bot:
                 return
         
         semaphore = asyncio.Semaphore(200)  # 限制并发处理任务数量为200
-        await self.plugin_manager.dispatch_message(message, semaphore)
+
+        try:
+            await self.plugin_manager.dispatch_message(message, semaphore)
+        except KeyError as e:
+            if str(e) == "'raw_message'":
+                logger.debug("收到的消息中缺少 'raw_message' 字段")
+            else:
+                logger.error(f"某个插件在处理消息时出错: {e}")
+        except Exception as e:
+            if str(e) == "'Bot' object has no attribute 'bot'":
+                logger.error(f"某个插件错误的传递或访问 Bot 实例: {e}")
+            else:
+                logger.error(f"某个插件在处理消息时出错: {e}")
 
     async def schedule_updates(self):
         # 异步定时任务
