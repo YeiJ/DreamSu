@@ -19,7 +19,8 @@ send_private_msg(self.bot.base_url, user_id, massage, self.bot.token)
 
 ### 使用本框架内置的额外方法
 
-详见 `更多方法/` 下的其他 md 文件
+详见 `更多方法/` 下的其他 md 文件。
+注：文档会比实际方法更新的更慢。
 
 ---
 
