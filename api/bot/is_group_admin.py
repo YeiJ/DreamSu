@@ -9,7 +9,7 @@ def is_group_admin(self, group_id, user_id):
     group_member_info = get_group_member_info(self.base_url, group_id, user_id, False, self.token)
 
     # 检查响应状态
-    if group_member_info['status'] != 'ok' or group_member_info['retcode'] != 0:
+    if group_member_info is None or group_member_info['status'] != 'ok' or group_member_info['retcode'] != 0:
         return False  # 请求失败，返回 False
 
     # 获取角色信息
