@@ -292,7 +292,6 @@ def get_group_list(base_url, token=None):
 
     return None
 
-
 def get_group_member_list(base_url, group_id, token=None):
     """
     获取指定群的所有成员信息列表

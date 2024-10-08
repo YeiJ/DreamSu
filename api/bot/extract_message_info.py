@@ -39,7 +39,7 @@ def extract_message_info(self, message):
             interval = message.get('interval', '未知心跳间隔')
 
             result = (
-                f"[{Fore.GREEN}心跳事件{Style.RESET_ALL}] "
+                f"[ {Fore.GREEN}心跳事件{Style.RESET_ALL} ] "
                 f"在线状态: {online_status} "
                 f"健康状态: {good_status} "
                 f"心跳间隔: {interval} ms \n"
@@ -50,7 +50,7 @@ def extract_message_info(self, message):
             sub_type = message.get('sub_type', '未知子类型')
 
             result = (
-                f"[{Fore.YELLOW}生命周期事件{Style.RESET_ALL}] "
+                f"[ {Fore.YELLOW}生命周期事件{Style.RESET_ALL} ] "
                 f"子类型: {sub_type}"
             )
             message_content.append(result)
@@ -77,10 +77,10 @@ def extract_message_info(self, message):
                 group_name = group_info.get('group_name', '未找到群名称')
 
             result = (
-                f"[{Fore.RED}群消息撤回{Style.RESET_ALL}] "
+                f"[ {Fore.RED}群消息撤回{Style.RESET_ALL} ] "
                 f"群ID {group_id} "
                 f"群名称 {group_name} \n"
-                f"用户  {operator_id} "
+                f"> 用户  {operator_id} "
                 f"撤回了用户 {user_id} "
                 f"的消息: {message_id} \n"
             )
@@ -91,7 +91,7 @@ def extract_message_info(self, message):
             message_id = message.get('message_id', '未知消息ID')
 
             result = (
-                f"[{Fore.RED}好友消息撤回{Style.RESET_ALL}] "
+                f"[ {Fore.RED}私聊消息撤回{Style.RESET_ALL} ] "
                 f"用户ID: {user_id} "
                 f"被撤回消息ID: {message_id} \n"
             )
@@ -104,7 +104,7 @@ def extract_message_info(self, message):
             user_id = message.get('user_id', '未知用户ID')
 
             result = (
-                f"[{Fore.GREEN}新成员入群{Style.RESET_ALL}] "
+                f"[ {Fore.GREEN}新成员入群{Style.RESET_ALL} ] "
                 f"操作用户ID: {operator_id} "
                 f"操作类型: {sub_type} "
                 f"群ID: {group_id} "
@@ -138,10 +138,10 @@ def extract_message_info(self, message):
             # 根据目标ID判断是群消息还是私聊消息
             if target_id == self.bot_info.get('user_id'):  # 私聊消息
                 result = (
-                    f"[{Fore.BLUE}好友互动消息{Style.RESET_ALL}] "
+                    f"[ {Fore.BLUE}私聊互动消息{Style.RESET_ALL} ] "
                     f"发起用户ID: {user_id} "
                     f"目标用户ID: {target_id} \n"
-                    f"互动类型: {interaction_details_str}"
+                    f"> 互动类型: {interaction_details_str}"
                 )
             else:  # 群消息
                 group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
@@ -154,12 +154,12 @@ def extract_message_info(self, message):
                     group_name = group_info.get('group_name', '未找到群名称')
 
                 result = (
-                    f"[{Fore.GREEN}群互动消息{Style.RESET_ALL}] "
+                    f"[ {Fore.GREEN}群互动消息{Style.RESET_ALL} ] "
                     f"群ID: {target_id} "
                     f"群名称: {group_name} \n"
-                    f"发起用户ID: {user_id} "
+                    f"> 发起用户ID: {user_id} "
                     f"目标用户ID: {target_id} \n"
-                    f"互动类型: {interaction_details_str} \n"
+                    f"> 互动类型: {interaction_details_str} \n"
                 )
 
             message_content.append(result)
@@ -184,19 +184,62 @@ def extract_message_info(self, message):
             formatted_file_size = self.format_file_size(file_size) # type: ignore
 
             result = (
-                f"[{Fore.GREEN}群文件上传{Style.RESET_ALL}] "
+                f"[ {Fore.GREEN}群文件上传{Style.RESET_ALL} ] "
                 f"群ID: {group_id} "
                 f"群名称: {group_name} || "
                 f"上传用户ID: {user_id} \n"
-                f"文件ID: {file_id} "
+                f"> 文件ID: {file_id} "
                 f"文件大小: {formatted_file_size} \n"
-                f"文件名: {file_name} \n"
+                f"> 文件名: {file_name} \n"
             )
             message_content.append(result)
 
+        elif notice_type == 'group_ban':
+            operator_id = message.get('operator_id', '未知操作用户ID')
+            user_id = message.get('user_id', '未知用户ID')
+            group_id = message.get('group_id', '未知群ID')
+            duration = message.get('duration', 0)
+
+            # 计算禁言时长的单位
+            if duration == 0:
+                ban_status = "解除禁言"
+            else:
+                days = duration // 86400
+                hours = (duration % 86400) // 3600
+                minutes = (duration % 3600) // 60
+
+                time_parts = []
+                if days > 0:
+                    time_parts.append(f"{days} 天")
+                if hours > 0:
+                    time_parts.append(f"{hours} 小时")
+                if minutes > 0:
+                    time_parts.append(f"{minutes} 分钟")
+
+                ban_status = "禁言" + "、".join(time_parts) if time_parts else "未知时长"
+
+            group_info = next((group for group in self.group_list if group['group_id'] == group_id), None)
+            logger.debug(f"获取的 group_info: {group_info}")  
+            
+            if group_info is None:
+                logger.debug("group_info 为 None，无法提取信息")  
+                group_name = '#'
+            else:
+                group_name = group_info.get('group_name', '未找到群名称')
+
+            result = (
+                f"[ {Fore.RED}群禁言通知{Style.RESET_ALL} ] "
+                f"群ID {group_id} "
+                f"群名称 {group_name} \n"
+                f"> 管理员 {operator_id} 将 用户 {user_id} "
+                f"> {ban_status}\n"
+            )
+            message_content.append(result)
+
+
         else:
             message_content.append(f"未知通知类型: {notice_type}")
-            return f"[原始消息内容] \n {message} \n"
+            return f"[ 原始消息内容 ] \n>> {message} \n"
 
 
     elif 'message' in message:
@@ -243,18 +286,32 @@ def extract_message_info(self, message):
                 # 处理json卡片消息
                 json_data = json.loads(data.get('data', '{}'))
                 meta = json_data.get('meta', {})
-                news = meta.get('news', {})
-                title = news.get('title', '未知标题')
-                desc = news.get('desc', '未知描述')
-                jump_url = news.get('jumpUrl', '#')
-                preview = news.get('preview', '')
-                prompt = json_data.get('prompt', '')
                 
-                card_info = f" {prompt}\n    [标题] {title}: {desc} \n    [链接] {jump_url} \n    [预览图] {preview} "
+                # 检查是否是网易云音乐消息
+                if 'music' in meta:
+                    music_info = meta['music']
+                    title = music_info.get('title', '未知标题')
+                    desc = music_info.get('desc', '未知描述')
+                    jump_url = music_info.get('jumpUrl', '#')
+                    preview = music_info.get('preview', '')
+                    prompt = json_data.get('prompt', '')
+
+                    card_info = f" {prompt}\n    [标题] {title}: {desc} \n    [链接] {jump_url} \n    [预览图] {preview} "
+                else:
+                    news = meta.get('news', {})
+                    title = news.get('title', '未知标题')
+                    desc = news.get('desc', '未知描述')
+                    jump_url = news.get('jumpUrl', '#')
+                    preview = news.get('preview', '')
+                    prompt = json_data.get('prompt', '')
+
+                    card_info = f" {prompt}\n    [标题] {title}: {desc} \n    [链接] {jump_url} \n    [预览图] {preview} "
+                
                 message_content.append(card_info)
+
             else:
                 message_content.append(f"未知内容类型: {content_type}")
-                return f"原始消息内容: \n {message}"
+                return f"[ 原始消息内容 ] \n>> {message} \n"
 
     # 检查是否为主人消息
     admin_marker = ""
@@ -301,7 +358,7 @@ def extract_message_info(self, message):
             f"  {group_name} ( {Fore.CYAN}{group_id}{Style.RESET_ALL} ) 消息ID: {message_id}\n"    # 群聊信息
             f"|| {nickname} · {Fore.CYAN}{user_id}{Style.RESET_ALL}" # 用户信息
             f" {admin_marker}\n"
-            f">  {' '.join(message_content) }\n" # 内容
+            f">>  {' '.join(message_content) }\n" # 内容
         )
     elif message_type == 'private':
         # 格式化输出
@@ -310,7 +367,7 @@ def extract_message_info(self, message):
             f"{nickname} · {Fore.CYAN}{user_id}{Style.RESET_ALL} " # 用户信息
             f"|| 消息ID {message_id} "
             f" {admin_marker}\n"
-            f"> {' '.join(message_content) }\n" # 内容
+            f">> {' '.join(message_content) }\n" # 内容
         )
 
     return result
