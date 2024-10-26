@@ -1,34 +1,32 @@
-<div style="display: flex; align-items: flex-start;">
-  <img src="images/DreamSu.png" width="200" height="auto" alt="DreamSu" style="margin-right: 20px;">
-  <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-    <div>
-      <h1 style="text-align: left;">DreamSu</h1>
-      <p style="text-align: left;">_✨ 基于 OneBotv11 上游接口机器人Api的 Python 原生实现 ✨_</p>
-      <div style="text-align: left;">
-        <a href="https://raw.githubusercontent.com/YeiJ/DreamSu/main/LICENSE">
-          <img src="https://img.shields.io/github/license/YeiJ/DreamSu" alt="license">
-        </a>
-        <a href="https://github.com/howmanybots/onebot/blob/master/README.md">
-          <img src="https://img.shields.io/badge/OneBot-v11-blue" alt="OneBot">
-        </a>
-      </div>
-    </div>
-    <br><br><br><br>
-    <p style="text-align: left; font-size: 0.8em; color: gray; margin-top: auto;">
-      感谢 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 大佬为苏梦创作的立绘。
-      <br>
-      此图片的著作权归 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 所有，本项目的开源协议不适用于该图片。
-      <br>
-      图片中的 `时钟` 样式图标为 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 的个人 logo , 图中的 `YJ` 艺术字样图片为 <a href="https://github.com/YeiJ">YeiJ</a> 的个人 logo 。
-      著作权分别归各自所有，禁止在未经授权的情况下随意盗取使用。
-      <br>
-      图片中的 `DreamSu` 文字部分所使用的字体 `Perfect Dark BRK` 与绘画主体及项目无关，其版权来自 ÆNIGMA FONTS [e-mail] kentpw@norwich.net
-    </p>
-  </div>
+<div align="center">
+  <img src="images/DreamSu.png" width="200" height="auto" alt="DreamSu" style="margin-right: 20px; display: inline-block;">
 </div>
 
+# DreamSu
 
+_✨ 基于 OneBotv11 上游接口机器人Api的 Python 原生实现 ✨_
 
+<div align="center">
+  <a href="https://raw.githubusercontent.com/YeiJ/DreamSu/main/LICENSE">
+    <img src="https://img.shields.io/github/license/YeiJ/DreamSu" alt="license">
+  </a>
+  <a href="https://github.com/howmanybots/onebot/blob/master/README.md">
+    <img src="https://img.shields.io/badge/OneBot-v11-blue" alt="OneBot">
+  </a>
+</div>
+
+<br><br>
+
+<small>
+      感谢 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 大佬为苏梦创作的立绘。
+      <br>
+      此图片的著作权归 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 所有，本项目的开源协议不适用于该图片。禁止在未经许可的情况下随意使用本图的任意部分。
+      <br>
+      图片中的 时钟 样式图标为 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 的个人 logo , 图中的 YJ 艺术字样图片为 <a href="https://github.com/YeiJ">YeiJ</a> 的个人 logo 。
+      著作权分别归各自所有，禁止在未经授权的情况下随意盗取使用。
+      <br>
+      图片中的 DreamSu 文字部分所使用的字体 Perfect Dark BRK 与绘画主体及项目无关，其版权来自 ÆNIGMA FONTS [e-mail] kentpw@norwich.net
+</small>
 
 
 
