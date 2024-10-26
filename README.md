@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/DreamSu.png" width="200" height="auto" alt="DreamSu" style="margin-right: 20px; display: inline-block;">
+  <img src="images/DreamSu.png" width="200" height="auto" alt="DreamSu" style="margin-right: 20px; display: inline-block;">¹
 </div>
 
 # DreamSu
@@ -64,8 +64,7 @@ DreamSu 意为苏梦，我的很多项目都叫这个名字。
 
 本项目仅在Github上发布仓库，[项目地址](https://github.com/YeiJ/DreamSu)。若在其他git仓库见到本项目军不是本人发布，使用时请注意甄别。
 
-- 
-  _感谢 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 大佬为苏梦创作的立绘。
+* ¹ _感谢 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 大佬为苏梦创作的立绘。
   <br>
   此图片的著作权归 <a href="https://www.pixiv.net/users/97453837" target="_blank">ReliMemorila</a> 所有，本项目的开源协议不适用于该图片。禁止在未经许可的情况下随意使用本图的任意部分。
   <br>
