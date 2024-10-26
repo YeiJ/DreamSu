@@ -355,7 +355,7 @@ def extract_message_info(self, message):
         # 格式化输出
         result = (
             f"[ {Fore.GREEN}{message_type_description}{Style.RESET_ALL} ] "   # 消息类型
-            f"  {group_name} ( {Fore.CYAN}{group_id}{Style.RESET_ALL} ) 消息ID: {message_id}\n"    # 群聊信息
+            f"{group_name} ( {Fore.CYAN}{group_id}{Style.RESET_ALL} ) 消息ID: {message_id}\n"    # 群聊信息
             f"|| {nickname} · {Fore.CYAN}{user_id}{Style.RESET_ALL}" # 用户信息
             f" {admin_marker}\n"
             f">>  {' '.join(message_content) }\n" # 内容

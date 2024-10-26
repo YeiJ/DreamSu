@@ -1,4 +1,7 @@
 import requests
+import logging
+
+logger = logging.getLogger("api.send")
 
 #发送私聊消息
 def send_private_msg(base_url, target_qq, message, token=None):
@@ -362,12 +365,12 @@ def send_msg(base_url, message_type, target_id, message, token=None):
             # print("消息发送成功！")
             return response.json()
         else:
-            print("请求失败，状态码:", response.status_code)
+            logger.error("消息发送失败，状态码:", response.status_code)
     except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP 请求错误: {http_err}")
+        logger.error(f"HTTP 请求错误: {http_err}")
         return None
     except Exception as err:
-        print(f"其他错误: {err}")
+        logger.error(f"消息发送失败，其他错误: {err}")
         return None
 
 

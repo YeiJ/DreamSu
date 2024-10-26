@@ -1,6 +1,9 @@
 # bot/api/is_group_admin.py
 
 from api.get import get_group_member_info
+import logging
+
+logger = logging.getLogger("DreamSu")
 
 def is_group_admin(self, group_id, user_id):
     """
@@ -14,6 +17,7 @@ def is_group_admin(self, group_id, user_id):
 
     # 获取角色信息
     role = group_member_info['data'].get('role', '')
+    logger.debug(f"[ is_group_admin ] 用户 {user_id} 在群 {group_id} 的身份为 {role}")
 
     # 判断是否为群管或以上权限
     return role in ['owner', 'admin']

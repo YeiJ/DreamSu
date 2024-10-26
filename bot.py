@@ -60,6 +60,7 @@ class Bot:
         self.bot_info = {} 
         self.bot_id = None
         self.bot_nickname = None
+        self.get_cookies = {} 
         
         # 初始化FastAPI
         self.app = FastAPI()
@@ -76,13 +77,17 @@ class Bot:
         
         logger.info("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-||")
 
-        from api.get import get_login_info
+        from api.get import get_login_info, get_cookies
         logger.info("正在获取bot账号信息...")
         self.bot_info = get_login_info(self.base_url, self.token)
         self.bot_id = self.bot_info.get('user_id')
         self.bot_nickname = self.bot_info.get('nickname')
         logger.info(f"账号: {self.bot_id} ")
         logger.info(f"昵称: {self.bot_nickname} ")
+
+        self.get_cookies_url = "act.qzone.qq.com"
+        self.get_cookies = get_cookies(self.base_url, self.get_cookies_url, self.token)
+        logger.debug(f"获取 bot 在 docs.qq.com 的 cookie : \n{self.get_cookies} \n")
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
@@ -188,7 +193,7 @@ class Bot:
                         # 格式化消息并输出到日志
                         extracted_info = self.extract_message_info(data)
                         if data.get('post_type') == 'meta_event':
-                            logger.debug("\n- - -收到 WebSocket 消息- - -\n%s\n- -**- -**- -**- -", extracted_info)
+                            logger.debug("[WS生命状态]%s", extracted_info)
                         else:
                             logger.info("[WSmsg]%s ", extracted_info)
                         
