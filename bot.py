@@ -65,6 +65,8 @@ class Bot:
         # 初始化FastAPI
         self.app = FastAPI()
 
+        self.dv = 0
+
         # 增加消息队列
         self.message_queue = asyncio.Queue()
 
@@ -85,17 +87,44 @@ class Bot:
         logger.info(f"账号: {self.bot_id} ")
         logger.info(f"昵称: {self.bot_nickname} ")
 
+        if not self.bot_info or 'user_id' not in self.bot_info or 'nickname' not in self.bot_info:
+            logger.warning("获取 bot 账号信息失败或数据缺失！")
+            self.dv += 1
+
         self.get_cookies_url = "act.qzone.qq.com"
         self.get_cookies = get_cookies(self.base_url, self.get_cookies_url, self.token)
         logger.debug(f"获取 bot 在 {self.get_cookies_url} 的 cookie : \n{self.get_cookies} \n")
 
+        if not self.get_cookies:
+            logger.warning("获取 cookies 失败或数据为空！")
+            self.dv += 1
+
+        try:
         # 更新好友列表和群列表
-        logger.info("正在加载好友列表...")
-        new_friends, removed_friends, len_friends = await self.update_friend_list()
-        logger.info(f"加载成功 {len_friends} 个好友\n")
-        logger.info("正在加载群列表...")
-        new_groups, removed_groups, len_groups = await self.update_group_list()
-        logger.info(f"加载成功 {len_groups} 个群聊")
+            logger.info("正在加载好友列表...")
+            new_friends, removed_friends, len_friends = await self.update_friend_list()
+            logger.info(f"加载成功 {len_friends} 个好友\n")
+        except TypeError as e:
+            logger.warning("加载好友列表时发生错误: %s", str(e))
+            self.dv += 3
+
+        try:
+            logger.info("正在加载群列表...")
+            new_groups, removed_groups, len_groups = await self.update_group_list()
+            logger.info(f"加载成功 {len_groups} 个群聊")
+        except TypeError as e:
+            logger.warning("加载群列表时发生错误: %s", str(e))
+            self.dv += 6
+        
+        if self.dv == 0:
+            pass
+        elif self.dv < 3:
+            logger.warning("Bot账号数据残缺")
+        elif self.dv >= 3:
+            logger.warning(" ")
+            logger.warning("Bot账号数据严重残缺")
+            logger.warning("框架尝试继续运行，不保证稳定性。随时可能崩溃。")
+            logger.warning(" ")
 
         # 启动异步更新任务
         asyncio.create_task(self.schedule_updates())
@@ -258,13 +287,20 @@ class Bot:
         # 异步定时任务
         async def update_friends():
             while True:
-                await self.update_friend_list()
+                try:
+                    await self.update_friend_list()
+                except Exception as e:
+                    logger.warning("更新好友列表时发生错误: %s", str(e))
                 await asyncio.sleep(60)  # 每1分钟更新好友列表
 
         async def update_groups():
             while True:
-                await self.update_group_list()
+                try:
+                    await self.update_group_list()
+                except Exception as e:
+                    logger.warning("更新群列表时发生错误: %s", str(e))
                 await asyncio.sleep(300)  # 每5分钟更新群列表
 
         # 启动并行任务
         await asyncio.gather(update_friends(), update_groups())
+
