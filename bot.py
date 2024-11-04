@@ -17,6 +17,9 @@ logger = logging.getLogger("DreamSu")
 class Bot:
     def __init__(self):
 
+        # 确保目录存在
+        os.makedirs("cache", exist_ok=True)
+
         # 动态加载 API 方法
         # self.load_api_methods('api') 禁止这样做
         self.load_api_methods('api/bot')
