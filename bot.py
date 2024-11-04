@@ -87,7 +87,7 @@ class Bot:
 
         self.get_cookies_url = "act.qzone.qq.com"
         self.get_cookies = get_cookies(self.base_url, self.get_cookies_url, self.token)
-        logger.debug(f"获取 bot 在 docs.qq.com 的 cookie : \n{self.get_cookies} \n")
+        logger.debug(f"获取 bot 在 {self.get_cookies_url} 的 cookie : \n{self.get_cookies} \n")
 
         # 更新好友列表和群列表
         logger.info("正在加载好友列表...")
