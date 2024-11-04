@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
     "rq_http_url": "http://localhost:3001",  /* ### 必填项 ### */
     /* 这里是你的 OneBot 服务端 的 HTTP 服务监听地址与端口 */
-    "rt_http_prot": 18080,  
+    "rt_http_port": 18080,  
     /* 这里是你的 OneBot 服务端 接收 HTTP 事件上报的监听端口 */
 
     "f_ws_url": "ws://localhost:3002",  

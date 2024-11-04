@@ -17,8 +17,10 @@ logger = logging.getLogger("DreamSu")
 class Bot:
     def __init__(self):
 
-        # 确保目录存在
+        # 确保关键目录存在
         os.makedirs("cache", exist_ok=True)
+        os.makedirs("logs", exist_ok=True)
+        os.makedirs("plugins", exist_ok=True)
 
         # 动态加载 API 方法
         # self.load_api_methods('api') 禁止这样做
@@ -34,7 +36,7 @@ class Bot:
         self.rtmsg_type = config.get("rtmsg_type", "http")  # 默认为 HTTP
         self.rq_type = config.get("rq_type", "http")  # 默认为 HTTP
 
-        self.rt_http_prot = config.get("rt_http_prot", 18080)  # HTTP 上报消息接收端口
+        self.rt_http_port = config.get("rt_http_port", 18080)  # HTTP 上报消息接收端口
         self.rq_http_url = config.get("rq_http_url")    # HTTP api 请求地址
 
         self.r_ws_port = config.get("r_ws_port", 18081) # 反向 ws 端口
@@ -197,7 +199,7 @@ class Bot:
         config = uvicorn.Config(
             self.app,
             host="0.0.0.0",
-            port=self.rt_http_prot,
+            port=self.rt_http_port,
             workers=4,
             log_level="critical"  # 仅记录严重错误
         )

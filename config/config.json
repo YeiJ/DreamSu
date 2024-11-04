@@ -2,7 +2,7 @@
     "rtmsg_type": "ws",
 
     "rq_http_url": "http://localhost:3001",
-    "rt_http_prot": 8081,
+    "rt_http_port": 8081,
 
     "f_ws_url": "ws://localhost:3002",
 
