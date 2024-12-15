@@ -113,7 +113,7 @@ def send_private_image_msg(base_url, target_qq, image_path, summary="", token=No
         return None
 
 
-#发送群文件
+#发送私聊文件
 def send_private_file_msg(base_url, user_id, file_path, file_name, token=None):
     """
     私聊文件消息。
