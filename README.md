@@ -17,7 +17,7 @@ _✨ 基于 OneBotv11 上游接口机器人Api的 Python 原生实现 ✨_
 
 ## 介绍
 
-一个通过 OneBotv11 协议的 HTTP 监听端口实现的 Python 机器人插件管理器框架。\
+一个通过 OneBotv11 协议的 HTTP 监听端口实现的 Python 机器人插件管理器框架。
 
 ## 目录
 
